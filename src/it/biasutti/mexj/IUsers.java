@@ -1,14 +1,16 @@
 package it.biasutti.mexj;
 
-interface IUsers {
-    int count();
+interface IUsers <T>{
 
-    User signUp(String userName);
-    User getUser(String userName);
-    User rename(User user, String newName);
-    Message publish(User publisher, String message) ;
+    IUser signUp(String userName);
+    IUser getUser(int id);
+    IUser getUser(String userName);
+    int findByName(String userName);
+    int findByObject(T item);
 
     /*
+    User rename(User user, String newName);
+    Message publish(User publisher, String message) ;
 
     User unFollow(String userName) ;
     Message[] queryFrom(int count) ;

@@ -47,79 +47,156 @@ public class Main {
          * x.QUERY-FROM(n)      U   recupero degli ultimi n messaggi pubblicati da x
          *
          * *****************************************
-         * *****************************************
-         * *****************************************
-         *
-         *          DEFINIZIONE DELLE CLASSI
-         *
-         * *****************************************
-         *
-         *
          */
 
-        // oggetto padre
         MexJ mexJ = new MexJ();
-        // contiene Users
+        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/A01.txt");
+        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/M01.txt");
+        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/Q01.txt");
+        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/Q02.txt");
+        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/A02.txt");
+        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/M02.txt");
+        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/Q01.txt");
+        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/Q02.txt");
+    }
+    public static void runTests() {
+        Users mexJ = new Users();
 
         // quanti utenti contiene?
-        console.log("Ora ci sono %s utenti", mexJ.users().count());
+        console.log("Ora ci sono %s utenti", mexJ.size());
 
-        User a = mexJ.users().signUp("Alice");
-        console.log("Ora ci sono %s utenti", mexJ.users().count());
-        console.log("%s è nel gruppo", a.getUserName());
+        console.log("Aggiungo Alice");
+        IUser a = mexJ.signUp("Alice");
+        console.log("Ora ci sono %s utenti", mexJ.size());
+        console.log("%s è nel gruppo", a.getName());
+        console.log();
 
-        User m = mexJ.users().signUp("Marta");
-        console.log("Ora ci sono %s utenti", mexJ.users().count());
-        console.log("%s è nel gruppo", m.getUserName());
+        console.log("Aggiungo Marta");
+        IUser m = mexJ.signUp("Marta");
+        console.log("Ora ci sono %s utenti", mexJ.size());
+        console.log("%s è nel gruppo", m.getName());
+        console.log();
 
-        User u = mexJ.users().signUp("Ugo");
-        console.log("Ora ci sono %s utenti", mexJ.users().count());
-        console.log("%s è nel gruppo", u.getUserName());
+        console.log("Aggiungo Ugo");
+        IUser u = mexJ.signUp("Ugo");
+        console.log("Ora ci sono %s utenti", mexJ.size());
+        console.log("%s è nel gruppo", u.getName());
+        console.log();
 
+        console.log("Ugo cambia nome in Giorgio");
         u.renameAs("Giorgio");
-        console.log("Ugo adesso si chiama %s", u.getUserName());
-
-        console.log(">>> genero un errore con Ugo");
-        u = mexJ.users("Ugo");
-
-        mexJ.users("Ugo").renameAs("Giorgio");
-        console.log(">>> fine errore con Ugo");
-        console.log("Ora ci sono %s utenti", mexJ.users().count());
-
-
-        console.log(">>> genero un errore con Giorgio");
-        u = mexJ.users("Giorgio");
-        console.log("  u si chiama %s", u.getUserName());
-        mexJ.users("Giorgio").renameAs("Marta");
-        console.log("  Giorgio adesso si chiama " + u.getUserName());
-        console.log(">>> fine errore con Giorgio");
-        console.log("Ora ci sono %s utenti", mexJ.users().count());
-
-
-        console.log(">>> genero un errore Alice.follow(marco)");
-        mexJ.users("Alice").follow("marco");
-
-        console.log(">>> genero un errore ciccio.follow(marco)");
-        mexJ.users("ciccio").follow("marco");
-
-        console.log(">>> Creo un Alice.follow(Giorgio)");
-        mexJ.users("Alice").follow("Giorgio");
-
-        console.log(">>> Elimino un Alice.follow(Giorgio)");
-        mexJ.users("Alice").unfollow("Giorgio");
-
-        mexJ.users("Alice").publish("welcome to world");
-        mexJ.users("Alice").mute("marco");
-        mexJ.users("Alice").unmute("marco");
-
+        console.log("Ugo adesso si chiama %s", u.getName());
+        console.log();
 /*
+        console.log("Genero un errore con Ugo (non esiste più");
+        u = mexJ.getUser("Ugo");
+        console.log("Genero un errore cambiando nome a Ugo");
+        u.renameAs("Giorgio");
+        console.log(">>> fine errore con Ugo");
 
 
-        mexJ.users("Alice").query(3).to("marco").result();
-        mexJ.users("Alice").query(3).from("marco").result();
+        console.log(">>> genero un errore rinominando Giorgio in Marta (esiste già");
+        u = mexJ.getUser("Giorgio");
+        console.log("u si chiama %s", u.getName());
+        u.renameAs("Marta");
+        console.log("  Giorgio adesso si chiama " + u.getName());
+        console.log(">>> fine errore con Giorgio");
+        console.log();
+
+        console.log("Genero un errore Alice.follow(marco)");
+        mexJ.getUser("Alice").follow("marco");
+        console.log();
+
+        console.log("Genero un errore ciccio.follow(marco)");
+        mexJ.getUser("ciccio").follow("marco");
+        console.log();
+
+        console.log("Creo un Alice.follow(Giorgio)");
+        mexJ.getUser("Alice").follow("Giorgio");
+        console.log();
+
+        console.log("Elimino un Alice.follow(Giorgio)");
+        mexJ.getUser("Alice").unfollow("Giorgio");
+        console.log();
+
+        console.log("Creo Marta.follow(Alice)");
+        m.follow(a.getName());
+
+        console.log("Creo Giorgio.follow(Alice)");
+        u.follow(a.getName());
 */
+        console.log();
+        console.log("Riprovo Marta.follow(Alice)");
+        m.follow(a);
+
+        console.log("riprovo Giorgio.follow(Alice)");
+        u.follow(a);
+
+        console.log();
+        console.log("Alice pubblica \"ciao da a\"");
+        a.publish("ciao da a");
+
+        console.log();
+        console.log("Creo Giorgio.follow(Marta)");
+        u.follow(m);
+
+       /* console.log();
+        console.log("Elimino Marta.follow(Alice)");
+        m.unfollow(a.getName());
+
+        console.log("elimino Giorgio.follow(Alice)");
+        u.unfollow(a);*/
+
+        console.log();
+        console.log("Alice pubblica \"ciao 2 da a\"");
+        a.publish("ciao 2 da a");
+
+        console.log();
+        console.log("Marta pubblica \"ciao da m\"");
+        m.publish("ciao da m");
+
+        console.log();
+        console.log("Giorgio pubblica \"ciao da g\"");
+        u.publish("ciao da g");
 
 
+        console.log();
+        console.log();
+        console.log("Giorgio mute Alice");
+        u.mute(a);
+
+
+        console.log();
+        console.log("Alice pubblica \"ciao 3 da a\"");
+        a.publish("ciao 3 da a");
+
+        console.log();
+        console.log("Marta pubblica \"ciao 3 da m\"");
+        m.publish("ciao 3 da m");
+
+        console.log();
+        console.log("Giorgio pubblica \"ciao 3 da g\"");
+        u.publish("ciao 3 da g");
+        console.log();
+        console.log("ricevuti da %s", u.getName());
+        console.log(u.queryReceived(4));
+        console.log();
+        console.log("spediti da %s", u.getName());
+        console.log(u.querySent(4));
+        console.log();
+        console.log();
+        console.log("ricevuti da %s", a.getName());
+        console.log(a.queryReceived(4));
+        console.log();
+        console.log("spediti da %s", a.getName());
+        console.log(a.querySent(4));
+        console.log();
+        console.log();
+        console.log("ricevuti da %s", m.getName());
+        console.log(m.queryReceived(4));
+        console.log();
+        console.log("spediti da %s", m.getName());
+        console.log(m.querySent(4));
+        console.log();
     }
-
 }

@@ -1,63 +1,65 @@
 package it.biasutti.mexj;
-import java.util.Hashtable;
 
-public class Users implements IUsers{
-    protected Hashtable<String, User> _users;
+public class Users<T> extends AbstractList<T> implements IUsers<T> {
 
-    public Users() {
-        _users = new Hashtable<String, User>();
-    }
-
-    public int count() {
-        return _users.size();
-    }
 
     /**
-     * se in _users NON esiste la chiave userName
-     *  crea un nuovo User con chiave = userName
-     *
+     * se in _items NON esiste la chiave userName
+     * crea un nuovo User con chiave = userName
+     * <p>
      * restituisce lo User con chiave = userName
-     * */
-    public User signUp(String userName) {
-        console.log("    user signUp: " + userName);
-        User u = getUser(userName);
-        if (u == null) {
-            u = new User(userName, this);
-            _users.put(userName, u);
-            console.log("    user created: " + userName);
+     */
+    public IUser signUp(String userName) {
+        int i = findByName(userName);
+
+        if (i > -1) {
+            console.log("    [%s] already signed", userName);
+            return _item(i);
         }
+
+        IUser u = new User(userName, this, _items.size());
+        _items.add((T) u);
+        console.log("    [%s].signup", userName);
         return u;
     }
 
-    public User getUser(String userName) {
-        return _users.get(userName);
+    public IUser getUser(String userName) {
+        int i = findByName(userName);
+        if (i > -1) {
+            return _item(i);
+        }
+        console.log("    user %s not present", userName);
+        return fakeUser();
     }
-    /**
-     * se in _users NON esiste la chiave newName
-     *  sostituisce la chiave di user con la chiave newName
-     *  restituisce user
-     *
-     * altrimenti
-     *  restituisce null
-     *
-     * */
-    public User rename(User user, String newName) {
-        // esiste user?
-        if (getUser(user.getUserName()) == null) {
-            return null;
+
+    public IUser getUser(int id) {
+        if (id > -1 && id < _items.size()) {
+            return (IUser) _items.get(id);
         }
-        // newName è libero?
-        if (getUser(newName) != null) {
-            return null;
-        }
-        _users.remove(user.getUserName());
-        _users.put(newName, user);
-        return user;
+        console.log("    user with id=%d not present", id);
+        return fakeUser();
     }
 
     @Override
-    public Message publish(User publisher, String message) {
-        console.log("L'utente %s pubblica il messaggio %s", publisher.getUserName(), message.toString());
-        return null;
+    public int findByObject(T item) {
+        return super.findByObject(item);
+    }
+
+    public int findByName(String userName) {
+        for (int i = 0; i < _items.size(); i++) {
+            if (userName.compareTo(_item(i).getName())==0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    private IUser fakeUser() {
+        console.log("    fake user created");
+        return new User("", this, -1);
+    }
+
+
+    private IUser _item(int i) {
+        return (IUser) _items.get(i);
     }
 }

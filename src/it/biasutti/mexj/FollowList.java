@@ -1,43 +1,42 @@
 package it.biasutti.mexj;
 
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
-public class FollowList implements Iterable{
-    protected Hashtable<String, User> _followers;
+public class FollowList<T> extends AbstractList<T> implements IPublisher<T>{
 
-    public FollowList() {
-        _followers = new Hashtable<String, User>();
+    @Override
+    public boolean subscribe(T user) {
+        if (findByObject(user) > -1){
+            return false;
+        }
+        console.log("subscribe da %s",console.user(user).getName());
+        _items.add(user);
+        return true;
     }
 
-    public int count() {
-        return _followers.size();
+    @Override
+    public boolean unsubscribe(T user) {
+        int i = findByObject(user);
+        if (i<0) {
+            return false;
+        }
+        console.log("unsubscribe da %s",console.user(user).getName());
+        _items.remove(i);
+        return true;
     }
-    public void add(User follower) {
-        if (!_followers.contains(follower)) {
-            _followers.put(follower.getUserName(), follower);
+
+    @Override
+    public void onNewMessage(T sender, Message message) {
+        /**
+         * TODO: correggere i riferimenti e usare la lambda
+         _items.forEach(
+         (IListener)listener -> listener.newMessage(sender, message)
+         );
+         */
+        for (int i = 0; i< _items.size(); i++) {
+            listener(i).newMessage(sender, message);
         }
     }
-    public void remove(User follower) {
-        if (_followers.contains(follower)) {
-            _followers.remove(follower.getUserName());
-        }
-    }
-
-    @Override
-    public Iterator iterator() {
-        return null;
-    }
-
-    @Override
-    public void forEach(Consumer action) {
-
-    }
-
-    @Override
-    public Spliterator spliterator() {
-        return null;
+    private IListener listener(int i) {
+        return (IListener)_items.get(i);
     }
 }
