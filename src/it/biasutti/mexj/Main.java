@@ -4,60 +4,26 @@ public class Main {
 
     public static void main(String[] args) {
 
-        /**
-         * @author Andrea Biasutti
-         *
-         * in args arrivano dei files che rappresentano
-         * il flusso delle operazioni svolte da utenti del servizio MexJ
-         *
-         * le operazioni possibili sono le seguenti:
-         *
-         * *****************************************
-         * x = new user()
-         * x.SIGN-UP(userName)  A   creazione di un utente con <userName>
-         *
-         * x = users(<username>)
-         * x.RENAME(newName)    A   modifica il nome: anche i vecchi messaggi / hint_oldName
-         *
-         *         NB: non sono ammessi userName duplicati
-         *
-         * *****************************************
-         *
-         * x = users(<username X>)
-         * y = users(<username Y>)
-         *
-         * x.FOLLOW(y)          A   l'utente x inizia ad osservare l'utente y
-         * x.UNFOLLOW(y)        A   l'utente x smette di osservare l'utente y
-         * x.MUTE(y)            A   l'utente x sospende l'ossevazione dell'utente y
-         * x.UNMUTE(y)          A   l'utente x riprende l'ossevazione dell'utente y
-         *                          il MUTE è reversibile: UNMUTE scopre anche i messaggi trascurati
-         *
-         * *****************************************
-         *
-         * x.PUBLISH(msg)       M   l'utente x pubblica un messaggio
-         *
-         * *****************************************
-         *
-         * x = users(<username>)
-         * x.QUERY-TO(n)        Q   recupero degli ultimi n messaggi destinati a x
-         *
-         * *****************************************
-         *
-         * x = users(<username>)
-         * x.QUERY-FROM(n)      U   recupero degli ultimi n messaggi pubblicati da x
-         *
-         * *****************************************
-         */
 
         MexJ mexJ = new MexJ();
-        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/A01.txt");
-        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/M01.txt");
-        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/Q01.txt");
-        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/Q02.txt");
-        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/A02.txt");
-        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/M02.txt");
-        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/Q01.txt");
-        mexJ.loadActionsFromFile("C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/Q02.txt");
+        String path ="C:/Users/andb7/IdeaProjects/tissino/Esame finale/MexJ/data/data/%s";
+        // mexJ.loadActionsFromFile(String.format(path, "A03.txt"));
+        // mexJ.loadActionsFromFile(String.format(path, "A02.txt"));
+        // mexJ.loadActionsFromFile(String.format(path, "M01.txt"));
+        // mexJ.loadActionsFromFile(String.format(path, "Q01.txt"));
+        // mexJ.loadActionsFromFile(String.format(path, "R02.txt"));
+         mexJ.loadActionsFromFile(String.format(path, "A01.txt"));
+        // mexJ.loadActionsFromFile(String.format(path, "M02.txt"));
+        // mexJ.loadActionsFromFile(String.format(path, "M03.txt"));
+        // mexJ.loadActionsFromFile(String.format(path, "Q01.txt"));
+        mexJ.loadActionsFromFile(String.format(path, "Q03.txt"));
+        // mexJ.loadActionsFromFile(String.format(path, "R03.txt"));
+        mexJ.shuffle();
+
+        mexJ.loadActionsFromFile(String.format(path, "Q03.txt"));
+        // mexJ.loadActionsFromFile(String.format(path, "R03.txt"));
+        mexJ.performAndDiscard();
+        console.log("Azioni rimase: %d",mexJ.actionCount());
     }
     public static void runTests() {
         Users mexJ = new Users();

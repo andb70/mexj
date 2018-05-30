@@ -7,7 +7,7 @@ interface IUsers <T>{
     IUser getUser(String userName);
     int findByName(String userName);
     int findByObject(T item);
-
+    int size();
     /*
     User rename(User user, String newName);
     Message publish(User publisher, String message) ;

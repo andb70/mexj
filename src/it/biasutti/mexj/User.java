@@ -1,23 +1,23 @@
 package it.biasutti.mexj;
 
-public class User<T> implements IUser<T>, IListener<T> {
+public class User implements IUser<FollowList, MessageList> , IListener<IUser, Message> {
 
     private String _name;
     private int _id;
     private IUsers<IUser> _parent;
-    private FollowList<IUser> _followers;
-    private MessageList<T> _sent;
-    private MessageList<T> _received;
-    private MuteList<T> _muted;
+    private FollowList<IUser, Message> _followers;
+    private MessageList<Message> _sent;
+    private MessageList<Message> _received;
+    private MuteList<IUser> _muted;
 
     User(String userName, Users parent, int id) {
         _name = userName;
         _parent = parent;
         _id = id;
-        _followers = new FollowList<IUser>();
-        _sent = new MessageList<T>();
-        _received = new MessageList<T>();
-        _muted = new MuteList<T>();
+        _followers = new FollowList<IUser, Message>();
+        _sent = new MessageList<Message>();
+        _received = new MessageList<Message>();
+        _muted = new MuteList<IUser>();
 
         console.log("        user (%d) created with name \"%s\".",_id, _name );
     }
@@ -63,19 +63,7 @@ public class User<T> implements IUser<T>, IListener<T> {
     }
     @Override
     public IUser follow(String followee) {
-        if (_id == -1) {
-            console.log("    [fake].follow");
-            return this;
-        }
-        int i = _parent.findByName(followee);
-        if (i==-1) {
-            console.log("    [not a user].follow");
-            return this;
-        }
-        IUser u = _parent.getUser(i);
-        console.log("    [%s].follow %s", _name, followee);
-        u.getFollowers().subscribe(this);
-        return this;
+        return this.follow(_parent.getUser(followee));
     }
     
     @Override
@@ -86,7 +74,7 @@ public class User<T> implements IUser<T>, IListener<T> {
         }
         int i = _parent.findByObject(followee);
         if (i==-1) {
-            console.log("    [not a user].follow");
+            console.log("    follow[not a user]");
             return this;
         }
         console.log("    [%s].follow %s", _name, followee.getName());
@@ -102,7 +90,7 @@ public class User<T> implements IUser<T>, IListener<T> {
         }
         int i = _parent.findByName(unfollowee);
         if (i==-1) {
-            console.log("    [not a user].unfollow");
+            console.log("    unfollow[not a user]");
             return this;
         }
         IUser u = _parent.getUser(i);
@@ -119,7 +107,7 @@ public class User<T> implements IUser<T>, IListener<T> {
         }
         int i = _parent.findByObject(unfollowee);
         if (i == -1) {
-            console.log("    [not a user].unfollow");
+            console.log("    unfollow[not a user]");
             return this;
         }
         console.log("    [%s].unfollow %s", _name, unfollowee.getName());
@@ -134,10 +122,10 @@ public class User<T> implements IUser<T>, IListener<T> {
         }
         int i = _parent.findByName(muteeName);
         if (i==-1) {
-            console.log("    [not a user].mute");
+            console.log("    mute[not a user]");
             return this;
         }
-        _muted.mute((T)_parent.getUser(i));
+        _muted.mute(_parent.getUser(i));
         return this;
     }
     @Override
@@ -148,10 +136,10 @@ public class User<T> implements IUser<T>, IListener<T> {
         }
         int i = _parent.findByObject(mutee);
         if (i == -1) {
-            console.log("    [not a user].mute");
+            console.log("    mute[not a user]");
             return this;
         }
-        _muted.mute((T)mutee);
+        _muted.mute(mutee);
         return this;
     }
     @Override
@@ -163,11 +151,11 @@ public class User<T> implements IUser<T>, IListener<T> {
         }
         int i = _parent.findByName(muteeName);
         if (i==-1) {
-            console.log("    [not a user].unmute");
+            console.log("    unmute[not a user]");
             return this;
         }
         IUser u = _parent.getUser(i);
-        _muted.unmute((T)u);
+        _muted.unmute(u);
         _received.unmute(u.getId());
         return this;
     }
@@ -179,10 +167,10 @@ public class User<T> implements IUser<T>, IListener<T> {
         }
         int i = _parent.findByObject(mutee);
         if (i == -1) {
-            console.log("    [not a user].unmute");
+            console.log("    unmute[not a user]");
             return this;
         }
-        _muted.unmute((T)mutee);
+        _muted.unmute(mutee);
         _received.unmute(mutee.getId());
         return this;
     }
@@ -190,7 +178,7 @@ public class User<T> implements IUser<T>, IListener<T> {
     public IUser publish(String message) {
         if (hasFollowers()) {
             Message m = new Message(message, _name ,_id );
-            console.log("    [%s].publish(%s)",_name, m.toString());
+            console.log("    [%s].publish \"%s\"",_name, message);
             _sent.add(m, false);
             getFollowers().onNewMessage(this, m);
         }
@@ -198,50 +186,37 @@ public class User<T> implements IUser<T>, IListener<T> {
     }
 
     @Override
-    public void newMessage(T sender, Message message) {
+    public void newMessage(IUser sender, Message message) {
         console.log("    [%s] has received message from %s",_name, console.user(sender).getName());
-        console.log(message.toString());
+        //console.log(message.toString());
         if (_muted.isMuted(sender)) {
-            console.log("    The user is muted and the message will be hidden");
+            console.log("    The user %s is muted and the message will be hidden", console.user(sender).getName());
         }
-        console.log(message.toString());
+        console.log("    Message: %s", message.toString());
         _received.add(message, _muted.isMuted(sender));
     }
 
 
     public String querySent(int count) {
-        String[] s = queryResult(_sent.getMessages(count));
-        String r ="";
-        for (String value : s) {
-            r = String.format("%s\n%s", r, value);
-        }
-        return r;
+        return queryResult(_sent.getMessages(count));
     }
 
     public String queryReceived(int count) {
-        String[] s = queryResult(_received.getMessages(count));
-        String r ="";
-        for (String value : s) {
-            r = String.format("%s\n%s", r, value);
-        }
-        return r;
+        return queryResult(_received.getMessages(count));
     }
 
-    private String[] queryResult(Message[] m) {
-        String[] s = new String[m.length];
-        for (int i = 0; i< m.length; i++){
-            s[i] = formatMessage(m[i]);
+    private String queryResult(Message[] messages) {
+        String s ="";
+        String z ="";
+        for (Message message : messages) {
+            s = String.format("%s%s%s\t%s\t%ts\t%s", s, z,
+                    _parent.getUser(message.getId()).getName(),
+                    message.getSignature(),
+                    message.getDate(),
+                    message.getMessage());
+            z = "\n";
         }
         return s;
     }
 
-    private String formatMessage(Message m) {
-        // Sender   Signature   Date    Message
-        return String.format("%s\t%s\t%ts\t%s",
-                _parent.getUser(m.getId()).getName(),
-                m.getSignature(),
-                m.getDate(),
-                m.getMessage()
-                );
-    }
 }

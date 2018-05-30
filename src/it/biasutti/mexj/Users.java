@@ -1,7 +1,7 @@
 package it.biasutti.mexj;
+public class Users extends AbstractList<IUser> implements IUsers<IUser> {
 
-public class Users<T> extends AbstractList<T> implements IUsers<T> {
-
+    private IUser _fakeUser;
 
     /**
      * se in _items NON esiste la chiave userName
@@ -14,52 +14,54 @@ public class Users<T> extends AbstractList<T> implements IUsers<T> {
 
         if (i > -1) {
             console.log("    [%s] already signed", userName);
-            return _item(i);
+            return _items.get(i);
         }
 
         IUser u = new User(userName, this, _items.size());
-        _items.add((T) u);
-        console.log("    [%s].signup", userName);
+        _items.add(u);
+        it.biasutti.mexj.console.log("    [%s].signup", userName);
         return u;
     }
 
+    /**
+     * per evitare che la chiamata a getUser provochi una
+     * NullPointerException quando l'utente richiesto non esiste
+     * viene restituito comunque un utente fake,
+     * è responsabilità del chiamante annullare le cui operazioni
+     * che vengono compiute dal fakeUser
+     */
     public IUser getUser(String userName) {
         int i = findByName(userName);
-        if (i > -1) {
-            return _item(i);
+        if (i < 0) {
+            console.log("    user %s not present", userName);
+            return fakeUser();
         }
-        console.log("    user %s not present", userName);
-        return fakeUser();
+        return _items.get(i);
     }
 
     public IUser getUser(int id) {
-        if (id > -1 && id < _items.size()) {
-            return (IUser) _items.get(id);
+        if (id < 0 || id > _items.size() - 1) {
+            console.log("    user with id=%d not present", id);
+            return fakeUser();
         }
-        console.log("    user with id=%d not present", id);
-        return fakeUser();
+        return _items.get(id);
     }
 
-    @Override
-    public int findByObject(T item) {
-        return super.findByObject(item);
+    private IUser fakeUser() {
+        if (_fakeUser == null) {
+            _fakeUser = new User("", this, -1);
+            console.log("    fake user created");
+        }
+        console.log("    using fake user");
+        return _fakeUser;
     }
 
     public int findByName(String userName) {
         for (int i = 0; i < _items.size(); i++) {
-            if (userName.compareTo(_item(i).getName())==0) {
+            if (userName.compareTo(_items.get(i).getName()) == 0) {
                 return i;
             }
         }
         return -1;
-    }
-    private IUser fakeUser() {
-        console.log("    fake user created");
-        return new User("", this, -1);
-    }
-
-
-    private IUser _item(int i) {
-        return (IUser) _items.get(i);
     }
 }

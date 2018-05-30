@@ -22,4 +22,8 @@ public abstract class AbstractList<T> {
         }
         return -1;
     }
+
+    public Iterable<T> items () {
+        return _items;
+    }
 }

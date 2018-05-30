@@ -5,6 +5,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Util {
+    public static String validateString(Object arg) {
+        try {
+            return (String) arg;
+        } catch (Exception e) {
+            // console.log("Action validateString", e);
+        }
+        return "";
+    }
+
     public static int validateNumber(Object arg) {
         try {
             return Integer.parseInt((String) arg);
@@ -36,32 +45,36 @@ public class Util {
         return CmdEnum.INVALID;
     }
 
-    public static int validateType(Object arg) {
+    public static ActionTypeEnum validateType(Object arg) {
         if (((String) arg).startsWith("A")) {
-            return 0;
+            return ActionTypeEnum.ADMINISTRATIVE;
         }
         if (((String) arg).startsWith("M")) {
-            return 1;
+            return ActionTypeEnum.MESSAGE;
         }
         if (((String) arg).startsWith("Q")) {
-            return 2;
+            return ActionTypeEnum.QUERYSENT;
         }
         if (((String) arg).startsWith("R")) {
-            return 3;
+            return ActionTypeEnum.QUERYRECEIVED;
         }
-        return -1;
+        return ActionTypeEnum.INVALID;
     }
 
     public static Date validateDate(Object arg) {
+        return Util.validateDate("yyy-MM-dd HH:mm:ss", arg);
+    }
+
+    public static Date validateDate(String format, Object arg) {
         String input = (String) arg;
-        SimpleDateFormat ft = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
+        SimpleDateFormat ft = new SimpleDateFormat(format);
         Date t;
         try {
             t = ft.parse(input);
             //console.log(t);
             //console.log(ft.format(t));
         } catch (ParseException e) {
-            console.log("UvalidateDate: nparseable using " + ft);
+            //console.log("UvalidateDate: nparseable using " + ft);
             t = new Date();
         } catch (Exception e) {
             console.log("validateDate: generic " + ft, e);
@@ -69,20 +82,12 @@ public class Util {
         }
         return t;
     }
-
-    public static String formatDate(String input) {
-        SimpleDateFormat ft = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
-        Date t;
-        String s;
-        try {
-            t = ft.parse(input);
-            console.log(t);
-            console.log(ft.format(t));
-            s = ft.format(t);
-        } catch (ParseException e) {
-            console.log("Unparseable using " + ft);
-            s = "";
+    public static String getFileName(String path){
+        String[] f = path.split("/");
+        if (f.length==0){
+            console.log("nome di file non valido");
+            return "";
         }
-        return s;
+        return f[f.length-1];
     }
 }

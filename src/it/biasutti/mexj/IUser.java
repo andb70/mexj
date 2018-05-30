@@ -1,12 +1,12 @@
 package it.biasutti.mexj;
 
-interface IUser<T> {
+interface IUser<T, M> {
     String getName();
     IUser renameAs(String newName);
     int getId();
     boolean signed();
 
-    FollowList getFollowers();
+    FollowList<T, M> getFollowers();
     MessageList getSentMessages();
     MessageList getReceivedMessages();
 
