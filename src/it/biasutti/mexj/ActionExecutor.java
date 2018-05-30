@@ -9,37 +9,37 @@ public class ActionExecutor implements IActionExecutor<Action> {
 
     @Override
     public boolean signUp(Action action) {
-        return _server.signUp(action.getUserName()).signed();
+        return (_server.signUp(action.getUserName())!=null);
     }
 
     @Override
     public boolean rename(Action action) {
-        return _server.getUser(action.getUserName()).renameAs(action.getDest()).signed();
+        return (_server.getUser(action.getUserName()).renameAs(action.getDest())!=null);
     }
 
     @Override
     public boolean follow(Action action) {
-        return _server.getUser(action.getUserName()).follow(action.getDest()).signed();
+        return (_server.getUser(action.getUserName()).follow(action.getDest())!=null);
     }
 
     @Override
     public boolean unfollow(Action action) {
-        return _server.getUser(action.getUserName()).unfollow(action.getDest()).signed();
+        return (_server.getUser(action.getUserName()).unfollow(action.getDest())!=null);
     }
 
     @Override
     public boolean mute(Action action) {
-        return _server.getUser(action.getUserName()).mute(action.getDest()).signed();
+        return (_server.getUser(action.getUserName()).mute(action.getDest())!=null);
     }
 
     @Override
     public boolean unmute(Action action) {
-        return _server.getUser(action.getUserName()).unmute(action.getDest()).signed();
+        return (_server.getUser(action.getUserName()).unmute(action.getDest())!=null);
     }
 
     @Override
     public boolean publish(Action action) {
-        return _server.getUser(action.getUserName()).publish(action.getMessage()).signed();
+        return (_server.getUser(action.getUserName()).publish(action.getMessage())!=null);
     }
 
     @Override

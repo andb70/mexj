@@ -4,63 +4,64 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
 /**
  * @author Andrea Biasutti
- *
+ * <p>
  * La classe MexJ gestisce comunicazioni del tipo "Tweeter" e consente
  * agli utenti di registrarsi con un nome e pubblicare messaggi.
  * Il nome deve essere univoco
  * *
  * Ogni utente può smettere di seguire ciascuno degli utenti che sta seguendo
-
+ * <p>
  * Ogni utente può seguire o essere seguito da altri utenti, in questo modo
  * ogni messaggio pubblicato da un utente X può essere ricevuto dagli N utenti
  * che lo seguno.
- *
+ * <p>
  * Ogni utente X seguito può essere messo in mute da ogni singolo utente che lo
  * segue in modo che, dal messaggio successivo al mute, i messaggi ricevuti da X
  * vengano registrati ma non mostrati. Se di seguito X viene riesumato da mute
  * anche i messaggi precedenti risulteranno visibili. Il mute non è retroattivo
-  *
+ * <p>
  * in args arrivano dei files che rappresentano
  * il flusso delle operazioni svolte da utenti del servizio di messaggistica MexJ
- *
+ * <p>
  * le operazioni possibili sono le seguenti:
- *
+ * <p>
  * *****************************************
  * x = new user()
  * x.SIGN-UP(userName)  A   creazione di un utente con <userName>
- *
+ * <p>
  * x = users(<username>)
  * x.RENAME(newName)    A   modifica il nome: anche i vecchi messaggi / hint_oldName
- *
- *         NB: non sono ammessi userName duplicati
- *
+ * <p>
+ * NB: non sono ammessi userName duplicati
+ * <p>
  * *****************************************
- *
+ * <p>
  * x = users(<username X>)
  * y = users(<username Y>)
- *
+ * <p>
  * x.FOLLOW(y)          A   l'utente x inizia ad osservare l'utente y
  * x.UNFOLLOW(y)        A   l'utente x smette di osservare l'utente y
  * x.MUTE(y)            A   l'utente x sospende l'ossevazione dell'utente y
  * x.UNMUTE(y)          A   l'utente x riprende l'ossevazione dell'utente y
- *                          il MUTE è reversibile: UNMUTE scopre anche i messaggi trascurati
- *
+ * il MUTE è reversibile: UNMUTE scopre anche i messaggi trascurati
+ * <p>
  * *****************************************
- *
+ * <p>
  * x.PUBLISH(msg)       M   l'utente x pubblica un messaggio
- *
+ * <p>
  * *****************************************
- *
+ * <p>
  * x = users(<username>)
  * x.QUERY-RECEIVED(n)  R   recupero degli ultimi n messaggi destinati a x
- *
+ * <p>
  * *****************************************
- *
+ * <p>
  * x = users(<username>)
  * x.QUERY-SENT(n)      Q   recupero degli ultimi n messaggi pubblicati da x
- *
+ * <p>
  * *****************************************
  */
 
@@ -68,11 +69,17 @@ public class MexJ {
     private Users _users;
     private ActionExecutor _exe;
     private ActionLogger<Action> _actions;
+    private Broker<IUser> _msgBoard;
 
-    MexJ() {
-        _users = new Users();
-        _exe = new ActionExecutor(_users);
-        //_exe = new ActionTester(_users);
+    MexJ(boolean test) {
+        _msgBoard = new Broker<IUser>();
+        _users = new Users(_msgBoard);
+        if (test) {
+            _exe = new ActionTester(_users);
+        } else {
+            _exe = new ActionExecutor(_users);
+        }
+
         _actions = new ActionLogger<Action>();
     }
 
@@ -111,12 +118,21 @@ public class MexJ {
         }
     }
 
-    public void process(String filename, Object... args) {
+    public void processWithExceptions(String filename, Object... args) {
+        try {
+            process(filename, args);
+        } catch (Exception e) {
+            console.log("        MexJ.Process", e);
+        }
+    }
+
+
+    public void process(String filename, Object... args) throws Exception {
         Action a = processDeferred(filename.substring(0, 1), args);
         if (a == null) {
             return;
         }
-        a.performBy(_exe);
+        console.log("result: %b", a.performBy(_exe));
     }
 
     public Action processDeferred(String filename, Object... args) {
@@ -136,15 +152,23 @@ public class MexJ {
     public void perform() {
         for (Action a : _actions.items()
                 ) {
-            a.performBy(_exe);
+            try {
+                a.performBy(_exe);
+            } catch (Exception e) {
+                console.log("perform action", e);
+
+            }
         }
     }
 
     public void performAndDiscard() {
-        Action a;
-        while ( _actions.size()>0) {
-            if (!_actions._items.get(0).performBy(_exe))
-                //console.log("Action FAIL!");
+        while (_actions.size() > 0) {
+            try {
+                Action a = _actions._items.get(0);
+                a.performBy(_exe);
+            } catch (Exception e) {
+                console.log("perform action", e);
+            }
             _actions._items.remove(0);
         }
     }

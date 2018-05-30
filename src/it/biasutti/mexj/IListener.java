@@ -1,7 +1,7 @@
 package it.biasutti.mexj;
 
-public interface IListener<T, M> {
+public interface IListener<S, M> {
 
-    void newMessage(T sender, M message);
+    void newMessage(S sender, M message);
 
 }

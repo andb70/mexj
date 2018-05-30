@@ -1,0 +1,33 @@
+MG	5
+EW	5
+DL	1
+FF	4
+TS	5
+	2
+GI	8
+WI	1
+UT	7
+EG	8
+UR	10
+UA	5
+YD	6
+PN	
+DE	5
+YU	2
+DV
+WP	9
+FC	9
+YX	4
+QJ	1
+WA	4
+	
+XO	4
+SH	7
+UX	2
+JO	7
+KZ	3
+JQ	2
+WL	7
+BJ	5
+ZE	5
+KB	5

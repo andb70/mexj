@@ -1,7 +1,7 @@
 package it.biasutti.mexj;
 
 interface IUsers <T>{
-
+    IPublisher getBroker();
     IUser signUp(String userName);
     IUser getUser(int id);
     IUser getUser(String userName);

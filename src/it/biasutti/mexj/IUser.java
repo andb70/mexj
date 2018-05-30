@@ -1,14 +1,15 @@
 package it.biasutti.mexj;
-
-interface IUser<T, M> {
+import java.util.List;
+import java.util.Map;
+interface IUser<M> {
     String getName();
     IUser renameAs(String newName);
     int getId();
     boolean signed();
 
-    FollowList<T, M> getFollowers();
-    MessageList getSentMessages();
-    MessageList getReceivedMessages();
+    Map<IUser, Integer> getFollowers();
+    List<M> getSentMessages();
+    List<M> getReceivedMessages();
 
     IUser follow(String followee);
     IUser unfollow(String followee);

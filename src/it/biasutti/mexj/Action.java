@@ -117,8 +117,9 @@ public class Action {
 
     }
 
-    public boolean performBy(IActionExecutor executor) {
-
+    public boolean performBy(IActionExecutor executor) throws Exception {
+        try {
+        console.log(toString());
         switch (_cmd){
             case SIGN_UP:
                 return executor.signUp(this);
@@ -140,6 +141,9 @@ public class Action {
                 return executor.querySent(this);
             default:
                 return false;
+        }
+    } catch (Exception e) {
+            throw new Exception("Errore in "+ _cmd.getValue());
         }
     }
     public boolean isValid() {
@@ -170,4 +174,30 @@ public class Action {
         return _message;
     }
 
+    @Override
+    public String toString() {
+        switch (_cmd){
+            case SIGN_UP:
+               return String.format("[%s].%s",_userName,_cmd.getValue());
+
+            case MESSAGE:
+                return String.format("[%s].%s(%s)",_userName,_cmd.getValue(), _message);
+
+            case RENAME:
+                return String.format("[%s].%s to [%s]",_userName,_cmd.getValue(), _dest);
+
+            case FOLLOW:
+            case UNFOLLOW:
+            case MUTE:
+            case UNMUTE:
+                return String.format("[%s].%s(%s)",_userName,_cmd.getValue(), _dest);
+
+            case QUERYRECEIVED:
+            case QUERYSENT:
+                return String.format("[%s].%s last(%d)",_userName,_cmd.getValue(), _count);
+
+            default:
+                return "Not a valid action";
+        }
+    }
 }

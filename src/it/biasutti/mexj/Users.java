@@ -1,7 +1,17 @@
 package it.biasutti.mexj;
 public class Users extends AbstractList<IUser> implements IUsers<IUser> {
+    private IPublisher<IUser, Message> _broker;
 
-    private IUser _fakeUser;
+
+    public Users(IPublisher<IUser, Message> broker) {
+        _broker = broker;
+    }
+
+
+    @Override
+    public IPublisher getBroker() {
+        return _broker;
+    }
 
     /**
      * se in _items NON esiste la chiave userName
@@ -19,7 +29,7 @@ public class Users extends AbstractList<IUser> implements IUsers<IUser> {
 
         IUser u = new User(userName, this, _items.size());
         _items.add(u);
-        it.biasutti.mexj.console.log("    [%s].signup", userName);
+        console.log("    [%s].signup", userName);
         return u;
     }
 
@@ -34,7 +44,7 @@ public class Users extends AbstractList<IUser> implements IUsers<IUser> {
         int i = findByName(userName);
         if (i < 0) {
             console.log("    user %s not present", userName);
-            return fakeUser();
+            return null;
         }
         return _items.get(i);
     }
@@ -42,18 +52,9 @@ public class Users extends AbstractList<IUser> implements IUsers<IUser> {
     public IUser getUser(int id) {
         if (id < 0 || id > _items.size() - 1) {
             console.log("    user with id=%d not present", id);
-            return fakeUser();
+            return null;
         }
         return _items.get(id);
-    }
-
-    private IUser fakeUser() {
-        if (_fakeUser == null) {
-            _fakeUser = new User("", this, -1);
-            console.log("    fake user created");
-        }
-        console.log("    using fake user");
-        return _fakeUser;
     }
 
     public int findByName(String userName) {
