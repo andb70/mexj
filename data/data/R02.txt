@@ -1,3 +1,0 @@
-Dorothea 5
-Emily 10
-Bob	3

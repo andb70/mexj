@@ -66,6 +66,49 @@ import java.io.IOException;
  */
 
 public class MexJ {
+    /*
+        questo è il manager di tutte le operazioni,
+        utilizza la classe core del progetto: Users
+        una classe in collaborazione: Broker
+        e altri accessori di automazione, vedere in
+        seguito ActionLogger
+
+        Users estende AbstractList che wrappa la ArrayList esponendo
+        il metodo per la ricerca degli oggetti findByObject utilizzato
+        da tutte le derivate (in realtà ne è rimasta solo una: Users)
+        espone inoltre due metodi wrapper signUp e getUsers, che
+        permettono l'accesso ai metodi di Users e User per la gestione
+        delle funzionalità del sistema
+
+        User è la classe usata da Users per arruolare gli utenti
+        e per permetterne l'interazione, tramite follow, mute, publish
+        e query
+
+        Broker gestisce le sottoscrizioni, i mute e la distribuzione
+        dei messaggi
+
+        Message contiene le informazioni del messaggio
+
+        TaggedValue è una coppia [Valore, Tag] utilizzato come valore
+        nelle HashMap per salvare le sottoscrizioni e i messaggi
+        in Broker
+
+        **********
+        ActionLogger e ActionExecutor hanno la funzione
+        di automatizzare la decodifica dei file delle azioni
+        e si sostituiscono all'uso diretto di users che avviene
+        comunque ache grazie ai due metodi wrapper citati sopra
+
+        Chiamando LoadActionFromFile  con deferred = false si crea
+        una azione che viene passata ad un oggetto esterno, responsabile
+        dell'esecuzione.
+        Con deferred = true l'operazione viene impilata e quando verrà
+        invocato il metodo performBy(executor) verra eseguita da executor
+
+
+
+
+     */
     private Users _users;
     private ActionExecutor _exe;
     private ActionLogger<Action> _actions;
@@ -82,11 +125,41 @@ public class MexJ {
 
         _actions = new ActionLogger<Action>();
     }
+
     public IUser signUp(String userName) {
         return _users.signUp(userName);
     }
     public IUser getUsers(String username) {
         return _users.getUser(username);
+    }
+
+    public void listUsers() {
+        console.log("List of users:\n%s", _users.listUsers());
+    }
+    public void listUsersAndFollowers() {
+        console.log("List of users and followers:\n%s", _users.listUsersAndFollowers());
+    }
+    public void listUsersAndFollowees() {
+        console.log("List of users and followees:\n%s", _users.listUsersAndFollowees());
+    }
+    public void listFollowers(String name) {
+        IUser u = _users.getUser(name);
+        if (u== null){
+            console.log("%s is not a user", name);
+            return;
+        }
+        String s = _users.listFollowers(u);
+        console.log("%s is followed by :\n%s",u.getName(), s);
+    }
+
+    public void listFollowees(String name) {
+        IUser u = _users.getUser(name);
+        if (u== null){
+            console.log("%s is not a user", name);
+            return;
+        }
+        String s = _users.listFollowees(u);
+        console.log("%s is following:\n%s",u.getName(), s);
     }
     public void loadActionsFromFile(String fileName) {
         this.loadActionsFromFile(fileName, true);
@@ -123,34 +196,6 @@ public class MexJ {
         }
     }
 
-    public void listUsers() {
-        console.log("List of users:\n%s", _users.listUsers());
-    }
-    public void listUsersAndFollowers() {
-        console.log("List of users and followers:\n%s", _users.listUsersAndFollowers());
-    }
-    public void listUsersAndFollowees() {
-        console.log("List of users and followees:\n%s", _users.listUsersAndFollowees());
-    }
-    public void listFollowers(String name) {
-        IUser u = _users.getUser(name);
-        if (u== null){
-            console.log("%s is not a user", name);
-            return;
-        }
-        String s = _users.listFollowers(u);
-        console.log("%s is followed by :\n%s",u.getName(), s);
-    }
-
-    public void listFollowees(String name) {
-        IUser u = _users.getUser(name);
-        if (u== null){
-            console.log("%s is not a user", name);
-            return;
-        }
-        String s = _users.listFollowees(u);
-        console.log("%s is following:\n%s",u.getName(), s);
-    }
     public void processWithExceptions(String filename, Object... args) {
         try {
             process(filename, args);

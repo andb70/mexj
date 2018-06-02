@@ -1,12 +1,35 @@
 package it.biasutti.mexj;
 
+import java.io.File;
+
 public class Main {
 
     public static void main(String[] args) {
-
-
         MexJ mexJ = new MexJ(false);
-        runTests1(mexJ);
+        /*runTests1(mexJ);*/
+
+
+        /*
+            si assume che i nomi dei files arrivino nella forma @##.txt
+            e che si trovino nella cartella data della user dir
+         */
+        String path = System.getProperty("user.dir") + "\\data\\%s";
+        path = path.replaceAll("\\\\", "/");
+
+        /*
+        deferred = true per eseguire tutte le operazioni dopo averle caricate
+        deferred = false per eseguire ogni azione appena dopo averla caricata
+         */
+        boolean deferred = true;
+        for (String arg : args) {
+            console.log(arg);
+            mexJ.loadActionsFromFile(String.format(path, arg), deferred);
+        }
+        if (deferred) {
+            mexJ.shuffle();
+            mexJ.performAndDiscard();
+        }
+
     }
 
     public static void runTests1(MexJ mexJ) {
@@ -22,8 +45,8 @@ public class Main {
         mexJ.getUsers("Primo user").publish("Benvenuti ai presenti");
         mexJ.getUsers("Primo user").publish("anche agli assenti");
         mexJ.getUsers("Primo user").publish("all'assenzio");
-        console.log( mexJ.getUsers("secondo user").queryReceived(5));
-        console.log( mexJ.getUsers("terzo user").queryReceived(5));
+        console.log(mexJ.getUsers("secondo user").queryReceived(5));
+        console.log(mexJ.getUsers("terzo user").queryReceived(5));
 
         mexJ.listUsersAndFollowers();
         mexJ.listUsersAndFollowees();
@@ -32,10 +55,10 @@ public class Main {
 
         mexJ.listUsersAndFollowers();
         mexJ.listUsersAndFollowees();
-        console.log( mexJ.getUsers("Primo user").queryReceived(5));
-        console.log( mexJ.getUsers("secondo user").queryReceived(5));
-        console.log( mexJ.getUsers("terzo user").queryReceived(5));
-        console.log( mexJ.getUsers("quarto user").queryReceived(5));
+        console.log(mexJ.getUsers("Primo user").queryReceived(5));
+        console.log(mexJ.getUsers("secondo user").queryReceived(5));
+        console.log(mexJ.getUsers("terzo user").queryReceived(5));
+        console.log(mexJ.getUsers("quarto user").queryReceived(5));
     }
 
     public static void runTests2(MexJ mexJ) {
