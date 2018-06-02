@@ -26,4 +26,7 @@ interface IUser<M> {
     String querySent(int count);
     String queryReceived(int count);
 
+    String listFollowees();
+    String listFollowers();
+
 }

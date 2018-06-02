@@ -8,7 +8,7 @@ public class User implements IUser<Message>, IListener<IUser, Message> {
 
     private String _name;
     private int _id;
-    private IUsers<IUser> _parent;
+    private IUsers<IUser, Message> _parent;
     private List<Message> _sent;
     private List<Message> _received;
 
@@ -19,7 +19,36 @@ public class User implements IUser<Message>, IListener<IUser, Message> {
         _sent = new ArrayList<Message>();
         _received = new ArrayList<Message>();
 
-        console.log("        user (%d) created with name \"%s\".", _id, _name);
+        //console.log("        user (%d) created with name \"%s\".", _id, _name);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("(%d) %s",_id,_name);
+    }
+
+    @Override
+    public String listFollowees() {
+        StringBuilder sb = new StringBuilder();
+        Map<IUser, Integer> followes = _parent.getBroker().getFollowees( this);
+        followes.forEach((user, lastMessage) ->{
+            String s = String.format("\t\t%s %s\n",user.getName(), (lastMessage<0) ? "": "MUTED");
+            sb.append(s);
+        });
+        return sb.toString();
+    }
+
+    @Override
+    public String listFollowers() {
+        if (!hasFollowers()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        getFollowers().forEach((user, lastMessage) ->{
+            String s = String.format("\t\t%s %d\n",user.getName(), lastMessage);
+            sb.append(s);
+        });
+        return sb.toString();
     }
 
     @Override
@@ -28,7 +57,7 @@ public class User implements IUser<Message>, IListener<IUser, Message> {
     }
 
     private boolean hasFollowers() {
-        return (getFollowers().size() > 0);
+        return (getFollowers()!=null);
     }
 
     @Override
@@ -62,6 +91,9 @@ public class User implements IUser<Message>, IListener<IUser, Message> {
 
     @Override
     public IUser renameAs(String newName) {
+        if (newName.compareTo(_name)== 0){
+            return this;
+        }
         if (_parent.findByName(newName) > -1) {
             console.log("    can't rename \"%s\" to \"%s\"", _name, newName);
             return null;
@@ -79,7 +111,14 @@ public class User implements IUser<Message>, IListener<IUser, Message> {
 
     @Override
     public IUser follow(IUser followee) {
-        return (IUser) _parent.getBroker().subscribe(this, followee);
+        if (this == followee) {
+            return null;
+        }
+        if (followee == null) {
+            return null;
+        }
+        console.log("    [%s].follow %s", _name, followee.getName());
+        return _parent.getBroker().subscribe(this, followee);
     }
 
     @Override
@@ -89,7 +128,11 @@ public class User implements IUser<Message>, IListener<IUser, Message> {
 
     @Override
     public IUser unfollow(IUser followee) {
-        return (IUser) _parent.getBroker().unsubscribe(this, followee);
+        if (this == followee) {
+            return null;
+        }
+        console.log("    [%s].unfollow %s", _name, followee.getName());
+        return _parent.getBroker().unsubscribe(this, followee);
     }
 
     @Override
@@ -99,7 +142,11 @@ public class User implements IUser<Message>, IListener<IUser, Message> {
 
     @Override
     public IUser mute(IUser mutee) {
-        return (IUser) _parent.getBroker().onMute(this, mutee);
+        if (this == mutee) {
+            return null;
+        }
+        console.log("    [%s].mute %s", _name, mutee.getName());
+        return _parent.getBroker().onMute(this, mutee);
     }
 
     @Override
@@ -109,6 +156,10 @@ public class User implements IUser<Message>, IListener<IUser, Message> {
 
     @Override
     public IUser unmute(IUser mutee) {
+        if (this == mutee) {
+            return null;
+        }
+        console.log("    [%s].unmute %s", _name, mutee.getName());
         _parent.getBroker().onUnmute(this, mutee);
         return this;
     }
@@ -120,7 +171,7 @@ public class User implements IUser<Message>, IListener<IUser, Message> {
             console.log("    [%s].publish \"%s\"", _name, message);
             _sent.add(m);
 
-            return (IUser)_parent.getBroker().onNewMessage(this, m);
+            return _parent.getBroker().onNewMessage(this, m);
         }
         return null;
     }
@@ -135,14 +186,16 @@ public class User implements IUser<Message>, IListener<IUser, Message> {
 
 
     public String querySent(int count) {
-        return queryResult((Message[]) _sent.toArray());
+        console.log("    [%s].query sent %s ", _name, count);
+        return queryResult( _sent);
     }
 
     public String queryReceived(int count) {
-        return queryResult((Message[]) _sent.toArray());
+        console.log("    [%s].query received %s ", _name, count);
+        return queryResult(_received);
     }
 
-    private String queryResult(Message[] messages) {
+    private String queryResult(List<Message> messages) {
         String s = "";
         String z = "";
         for (Message message : messages) {

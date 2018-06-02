@@ -6,5 +6,6 @@ interface IPublisher<T, M> {
     T onNewMessage(T sender, M message);
     T onMute(T user, T followee);
     T onUnmute(T user, T followee);
-    Map<T, M> getFollowers(T user);
+    Map<T, Integer> getFollowers(T user);
+    Map<T, Integer> getFollowees(T user);
 }

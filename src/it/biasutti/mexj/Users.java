@@ -1,5 +1,5 @@
 package it.biasutti.mexj;
-public class Users extends AbstractList<IUser> implements IUsers<IUser> {
+public class Users extends AbstractList<IUser> implements IUsers<IUser, Message> {
     private IPublisher<IUser, Message> _broker;
 
 
@@ -7,9 +7,50 @@ public class Users extends AbstractList<IUser> implements IUsers<IUser> {
         _broker = broker;
     }
 
+    public String listUsers() {
+        String s = "";
+        for(IUser user: _items) {
+            s = String.format("%s\t%s\n", s, user.getName());
+        }
+        return String.format("[\n%s]",s);
+    }
+
+    public String listUsersAndFollowees() {
+        String s = "";
+        for(IUser user: _items) {
+            s = String.format("%s\t%s\n%s\n",
+                    s,
+                    user.getName(),
+                    listFollowees(user));
+        }
+        return String.format("[\n%s]",s);
+    }
+
+    public String listUsersAndFollowers() {
+        String s = "";
+        for(IUser user: _items) {
+            String f = listFollowers(user);
+/*            if (f.length()>0) {
+                f = String.format("\n%s",f);
+            }*/
+            s = String.format("%s\t%s\n%s",
+                    s,
+                    user.getName(),
+                    f);
+        }
+        return String.format("[\n%s]",s);
+    }
+
+    public String listFollowees(IUser u) {
+        return u.listFollowees();
+    }
+
+    public String listFollowers(IUser u) {
+        return u.listFollowers();
+    }
 
     @Override
-    public IPublisher getBroker() {
+    public IPublisher<IUser,Message> getBroker() {
         return _broker;
     }
 

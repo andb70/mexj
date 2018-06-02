@@ -1,7 +1,7 @@
 package it.biasutti.mexj;
 
 public class ActionExecutor implements IActionExecutor<Action> {
-    protected IUsers _server;
+    protected IUsers<IUser, Message> _server;
 
     ActionExecutor(IUsers server) {
         _server = server;

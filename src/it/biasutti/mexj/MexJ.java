@@ -82,7 +82,12 @@ public class MexJ {
 
         _actions = new ActionLogger<Action>();
     }
-
+    public IUser signUp(String userName) {
+        return _users.signUp(userName);
+    }
+    public IUser getUsers(String username) {
+        return _users.getUser(username);
+    }
     public void loadActionsFromFile(String fileName) {
         this.loadActionsFromFile(fileName, true);
     }
@@ -118,6 +123,34 @@ public class MexJ {
         }
     }
 
+    public void listUsers() {
+        console.log("List of users:\n%s", _users.listUsers());
+    }
+    public void listUsersAndFollowers() {
+        console.log("List of users and followers:\n%s", _users.listUsersAndFollowers());
+    }
+    public void listUsersAndFollowees() {
+        console.log("List of users and followees:\n%s", _users.listUsersAndFollowees());
+    }
+    public void listFollowers(String name) {
+        IUser u = _users.getUser(name);
+        if (u== null){
+            console.log("%s is not a user", name);
+            return;
+        }
+        String s = _users.listFollowers(u);
+        console.log("%s is followed by :\n%s",u.getName(), s);
+    }
+
+    public void listFollowees(String name) {
+        IUser u = _users.getUser(name);
+        if (u== null){
+            console.log("%s is not a user", name);
+            return;
+        }
+        String s = _users.listFollowees(u);
+        console.log("%s is following:\n%s",u.getName(), s);
+    }
     public void processWithExceptions(String filename, Object... args) {
         try {
             process(filename, args);

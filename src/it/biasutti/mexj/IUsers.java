@@ -1,10 +1,10 @@
 package it.biasutti.mexj;
 
-interface IUsers <T>{
-    IPublisher getBroker();
-    IUser signUp(String userName);
-    IUser getUser(int id);
-    IUser getUser(String userName);
+interface IUsers <T, M>{
+    IPublisher<T, M> getBroker();
+    T signUp(String userName);
+    T getUser(int id);
+    T getUser(String userName);
     int findByName(String userName);
     int findByObject(T item);
     int size();
